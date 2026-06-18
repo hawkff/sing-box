@@ -65,7 +65,6 @@ type AmneziaWGOutboundOptions struct {
 	PeerPublicKey string      `json:"peer_public_key"`
 	PreSharedKey  string      `json:"pre_shared_key,omitempty"`
 	Reserved      []uint8     `json:"reserved,omitempty"`
-	Workers       int         `json:"workers,omitempty"`
 	MTU           uint32      `json:"mtu,omitempty"`
 	Network       NetworkList `json:"network,omitempty"`
 

@@ -92,7 +92,6 @@ func NewOutbound(ctx context.Context, router adapter.Router, logger log.ContextL
 			return endpointAddresses[0], nil
 		},
 		Peers:   peers,
-		Workers: options.Workers,
 
 		JunkPacketCount:            options.JunkPacketCount,
 		JunkPacketMinSize:          options.JunkPacketMinSize,

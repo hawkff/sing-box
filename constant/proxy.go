@@ -67,6 +67,8 @@ func ProxyDisplayName(proxyType string) string {
 		return "Naive"
 	case TypeWireGuard:
 		return "WireGuard"
+	case TypeAmneziaWG:
+		return "AmneziaWG"
 	case TypeHysteria:
 		return "Hysteria"
 	case TypeTor:

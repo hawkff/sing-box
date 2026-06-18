@@ -26,7 +26,6 @@ type EndpointOptions struct {
 	ListenPort   uint16
 	ResolvePeer  func(domain string) (netip.Addr, error)
 	Peers        []PeerOptions
-	Workers      int
 
 	// AmneziaWG obfuscation parameters. Empty/zero values are omitted from the
 	// device IPC configuration, in which case the device behaves like plain
