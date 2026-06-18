@@ -1,8 +1,6 @@
 module github.com/sagernet/sing-box
 
-go 1.24.4
-
-toolchain go1.24.9
+go 1.26.4
 
 require (
 	github.com/amnezia-vpn/amneziawg-go v1.0.4
