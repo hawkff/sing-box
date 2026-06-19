@@ -3,7 +3,7 @@ module github.com/sagernet/sing-box
 go 1.26.4
 
 require (
-	github.com/amnezia-vpn/amneziawg-go v0.2.19
+	github.com/amnezia-vpn/amneziawg-go v0.2.19 // default-branch release with s3/s4 UAPI support; v1.0.4 lacks those keys
 	github.com/anytls/sing-anytls v0.0.11
 	github.com/caddyserver/certmagic v0.23.0
 	github.com/coder/websocket v1.8.13
@@ -144,6 +144,7 @@ require (
 	golang.zx2c4.com/wireguard/windows v0.5.3 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	gvisor.dev/gvisor v0.0.0-20250606233247-e3c4c4cad86f // indirect
 )
 
 replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.5.3-0.20260618035506-f2f558c5aaba
