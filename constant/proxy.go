@@ -22,6 +22,7 @@ const (
 	TypeShadowTLS    = "shadowtls"
 	TypeAnyTLS       = "anytls"
 	TypeShadowsocksR = "shadowsocksr"
+	TypeSnell        = "snell"
 	TypeVLESS        = "vless"
 	TypeTUIC         = "tuic"
 	TypeHysteria2    = "hysteria2"
