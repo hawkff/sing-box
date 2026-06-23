@@ -5,8 +5,8 @@ import (
 	"errors"
 	"net"
 	"net/netip"
-	"syscall"
 	"sync/atomic"
+	"syscall"
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -32,6 +32,12 @@ var (
 // selection (nekobox/Android: the VPNService protect-hook handles fd protection).
 // It is an atomic.Bool because DialContext/ListenPacket read it concurrently.
 var DoNotSelectInterface atomic.Bool
+
+// ConcurrentDial mirrors the nekobox route.concurrent_dial setting. 1.13's dialer
+// already parallelizes multi-address dialing natively, so this is accepted for
+// config compatibility (NekoBox emits it) and exposed for callers that want to
+// gate the legacy concurrent-socket behavior. atomic.Bool for concurrent reads.
+var ConcurrentDial atomic.Bool
 
 type DefaultDialer struct {
 	dialer4                tfo.Dialer
