@@ -32,7 +32,7 @@ require (
 	github.com/sagernet/fswatch v0.1.2
 	github.com/sagernet/gomobile v0.1.12
 	github.com/sagernet/gvisor v0.0.0-20250811.0-sing-box-mod.1
-	github.com/sagernet/quic-go v0.59.0-sing-box-mod.4
+	github.com/sagernet/quic-go v0.59.0-sing-box-mod.5
 	github.com/sagernet/sing v0.8.10
 	github.com/sagernet/sing-mux v0.3.4
 	github.com/sagernet/sing-quic v0.6.1
@@ -166,3 +166,5 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 	lukechampine.com/blake3 v1.3.0 // indirect
 )
+
+replace github.com/sagernet/sing-quic => github.com/hawkff/sing-quic v0.6.2-0.20260623171805-c5b53db7a343
