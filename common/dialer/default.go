@@ -6,6 +6,7 @@ import (
 	"net"
 	"net/netip"
 	"syscall"
+	"sync/atomic"
 	"time"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -26,6 +27,11 @@ var (
 	_ ParallelInterfaceDialer = (*DefaultDialer)(nil)
 	_ WireGuardListener       = (*DefaultDialer)(nil)
 )
+
+// DoNotSelectInterface forces the default dialer to skip interface/network-strategy
+// selection (nekobox/Android: the VPNService protect-hook handles fd protection).
+// It is an atomic.Bool because DialContext/ListenPacket read it concurrently.
+var DoNotSelectInterface atomic.Bool
 
 type DefaultDialer struct {
 	dialer4                tfo.Dialer
@@ -245,7 +251,7 @@ func (d *DefaultDialer) DialContext(ctx context.Context, network string, address
 	} else if address.IsDomain() {
 		return nil, E.New("domain not resolved")
 	}
-	if d.networkStrategy == nil {
+	if DoNotSelectInterface.Load() || d.networkStrategy == nil {
 		return d.trackConn(listener.ListenNetworkNamespace[net.Conn](d.netns, func() (net.Conn, error) {
 			switch N.NetworkName(network) {
 			case N.NetworkUDP:
@@ -315,7 +321,7 @@ func (d *DefaultDialer) DialParallelInterface(ctx context.Context, network strin
 }
 
 func (d *DefaultDialer) ListenPacket(ctx context.Context, destination M.Socksaddr) (net.PacketConn, error) {
-	if d.networkStrategy == nil {
+	if DoNotSelectInterface.Load() || d.networkStrategy == nil {
 		return d.trackPacketConn(listener.ListenNetworkNamespace[net.PacketConn](d.netns, func() (net.PacketConn, error) {
 			if destination.IsIPv6() {
 				return d.udpListener.ListenPacket(ctx, N.NetworkUDP, d.udpAddr6)

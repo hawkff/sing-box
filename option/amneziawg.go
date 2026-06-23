@@ -39,6 +39,26 @@ type AmneziaWGOutboundOptions struct {
 	SpecialJunk5               string `json:"i5,omitempty"`
 }
 
+// LegacyWireGuardOutboundOptions is the plain WireGuard outbound schema used by
+// nekobox. Upstream 1.13 removed the wireguard outbound (endpoint-only); neko
+// restores it on top of transport/amneziawg with all obfuscation params left at
+// zero (identity), so the device behaves like plain WireGuard.
+type LegacyWireGuardOutboundOptions struct {
+	DialerOptions
+	SystemInterface bool                             `json:"system_interface,omitempty"`
+	InterfaceName   string                           `json:"interface_name,omitempty"`
+	LocalAddress    badoption.Listable[netip.Prefix] `json:"local_address"`
+	PrivateKey      string                           `json:"private_key"`
+	Peers           []LegacyWireGuardPeer            `json:"peers,omitempty"`
+	ServerOptions
+	PeerPublicKey string      `json:"peer_public_key"`
+	PreSharedKey  string      `json:"pre_shared_key,omitempty"`
+	Reserved      []uint8     `json:"reserved,omitempty"`
+	Workers       int         `json:"workers,omitempty"`
+	MTU           uint32      `json:"mtu,omitempty"`
+	Network       NetworkList `json:"network,omitempty"`
+}
+
 // LegacyWireGuardPeer is the AmneziaWG peer config. It mirrors the legacy
 // WireGuard peer schema (Server/ServerPort via embedded ServerOptions) so
 // existing AmneziaWG configs remain valid on the 1.13 base, where upstream
