@@ -29,15 +29,14 @@ require (
 	github.com/sagernet/cors v1.2.1
 	github.com/sagernet/fswatch v0.1.1
 	github.com/sagernet/gomobile v0.1.8
-	github.com/sagernet/gvisor v0.0.0-20250325023245-7a9c0f5725fb
+	github.com/sagernet/gvisor v0.0.0-20250822052253-5558536cf237
 	github.com/sagernet/quic-go v0.52.0-sing-box-mod.3
 	github.com/sagernet/sing v0.7.18
 	github.com/sagernet/sing-mux v0.3.4
-	github.com/sagernet/sing-quic v0.5.2
 	github.com/sagernet/sing-shadowsocks v0.2.8
 	github.com/sagernet/sing-shadowsocks2 v0.2.1
 	github.com/sagernet/sing-shadowtls v0.2.1-0.20250503051639-fcd445d33c11
-	github.com/sagernet/sing-tun v0.7.10
+	github.com/sagernet/sing-tun v0.7.13
 	github.com/sagernet/sing-vmess v0.2.7
 	github.com/sagernet/smux v1.5.50-sing-box-mod.1
 	github.com/sagernet/tailscale v1.80.3-sing-box-1.12-mod.2
@@ -49,9 +48,9 @@ require (
 	go.uber.org/zap v1.27.0
 	go4.org/netipx v0.0.0-20231129151722-fdeea329fbba
 	golang.org/x/crypto v0.48.0
-	golang.org/x/exp v0.0.0-20250506013437-ce4c2cf36ca6
+	golang.org/x/exp v0.0.0-20250911091902-df9299821621
 	golang.org/x/mod v0.32.0
-	golang.org/x/net v0.49.0
+	golang.org/x/net v0.50.0
 	golang.org/x/sys v0.41.0
 	golang.zx2c4.com/wireguard/wgctrl v0.0.0-20241231184526-a9ab2273dd10
 	google.golang.org/grpc v1.73.0
@@ -65,6 +64,8 @@ require (
 replace github.com/sagernet/sing-vmess => github.com/starifly/sing-vmess v0.2.8-mod.1
 
 replace github.com/metacubex/sing-shadowsocks2 => github.com/Restia-Ashbell/sing-shadowsocks2 v0.0.0-20250606153500-31ef7b14aaa6
+
+require github.com/sagernet/sing-quic v0.5.3
 
 require (
 	filippo.io/edwards25519 v1.1.0 // indirect
@@ -104,7 +105,7 @@ require (
 	github.com/kortschak/wol v0.0.0-20200729010619-da482cc4850a // indirect
 	github.com/libdns/libdns v1.1.0 // indirect
 	github.com/mdlayher/genetlink v1.3.2 // indirect
-	github.com/mdlayher/netlink v1.7.3-0.20250113171957-fbb4dce95f42 // indirect
+	github.com/mdlayher/netlink v1.9.0 // indirect
 	github.com/mdlayher/sdnotify v1.0.0 // indirect
 	github.com/mdlayher/socket v0.5.1 // indirect
 	github.com/metacubex/chacha v0.1.5 // indirect
@@ -117,7 +118,7 @@ require (
 	github.com/quic-go/qpack v0.5.1 // indirect
 	github.com/safchain/ethtool v0.3.0 // indirect
 	github.com/sagernet/netlink v0.0.0-20240612041022-b9a21c07ac6a // indirect
-	github.com/sagernet/nftables v0.3.0-beta.4 // indirect
+	github.com/sagernet/nftables v0.3.0-mod.2 // indirect
 	github.com/sirupsen/logrus v1.9.3 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/tailscale/certstore v0.1.1-0.20231202035212-d3fa0460f47e // indirect
