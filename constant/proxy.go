@@ -15,6 +15,7 @@ const (
 	TypeTrojan       = "trojan"
 	TypeNaive        = "naive"
 	TypeWireGuard    = "wireguard"
+	TypeAmneziaWG    = "amneziawg"
 	TypeHysteria     = "hysteria"
 	TypeTor          = "tor"
 	TypeSSH          = "ssh"
