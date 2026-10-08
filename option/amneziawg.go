@@ -65,8 +65,9 @@ type LegacyWireGuardOutboundOptions struct {
 // renamed its own peer type to WireGuardPeer with a different shape.
 type LegacyWireGuardPeer struct {
 	ServerOptions
-	PublicKey    string                           `json:"public_key,omitempty"`
-	PreSharedKey string                           `json:"pre_shared_key,omitempty"`
-	AllowedIPs   badoption.Listable[netip.Prefix] `json:"allowed_ips,omitempty"`
-	Reserved     []uint8                          `json:"reserved,omitempty"`
+	PublicKey                   string                           `json:"public_key,omitempty"`
+	PreSharedKey                string                           `json:"pre_shared_key,omitempty"`
+	AllowedIPs                  badoption.Listable[netip.Prefix] `json:"allowed_ips,omitempty"`
+	PersistentKeepaliveInterval uint16                           `json:"persistent_keepalive_interval,omitempty"`
+	Reserved                    []uint8                          `json:"reserved,omitempty"`
 }

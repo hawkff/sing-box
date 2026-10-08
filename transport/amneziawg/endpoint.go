@@ -27,6 +27,7 @@ type Endpoint struct {
 	peers          []peerConfig
 	ipcConf        string
 	allowedAddress []netip.Prefix
+	allowedIPs     *netipx.IPSet
 	tunDevice      Device
 	device         *device.Device
 	pause          pause.Manager
@@ -133,6 +134,7 @@ func NewEndpoint(options EndpointOptions) (*Endpoint, error) {
 		peers:          peers,
 		ipcConf:        ipcConf,
 		allowedAddress: allowedAddresses,
+		allowedIPs:     allowedIPSet,
 		tunDevice:      tunDevice,
 	}, nil
 }
@@ -207,17 +209,35 @@ func (e *Endpoint) Start(resolve bool) error {
 }
 
 func (e *Endpoint) DialContext(ctx context.Context, network string, destination M.Socksaddr) (net.Conn, error) {
-	if !destination.Addr.IsValid() {
-		return nil, E.Cause(os.ErrInvalid, "invalid non-IP destination")
+	if err := e.checkDestination(destination); err != nil {
+		return nil, err
 	}
 	return e.tunDevice.DialContext(ctx, network, destination)
 }
 
 func (e *Endpoint) ListenPacket(ctx context.Context, destination M.Socksaddr) (net.PacketConn, error) {
-	if !destination.Addr.IsValid() {
-		return nil, E.Cause(os.ErrInvalid, "invalid non-IP destination")
+	// An unspecified address only picks the address family of an unconnected socket, as the
+	// client bind of a multi-peer WireGuard detoured through this endpoint requests. Its packets
+	// still reach only destinations a peer accepts.
+	if !destination.Addr.IsUnspecified() {
+		if err := e.checkDestination(destination); err != nil {
+			return nil, err
+		}
 	}
 	return e.tunDevice.ListenPacket(ctx, destination)
+}
+
+// checkDestination rejects addresses no peer accepts. The device would drop their packets,
+// so the dial would otherwise only fail after a timeout, and a serial dial over several
+// resolved addresses would never reach one inside the allowed IPs.
+func (e *Endpoint) checkDestination(destination M.Socksaddr) error {
+	if !destination.Addr.IsValid() {
+		return E.Cause(os.ErrInvalid, "invalid non-IP destination")
+	}
+	if !e.allowedIPs.Contains(destination.Addr) {
+		return E.New("destination ", destination.Addr, " is outside the allowed IPs")
+	}
+	return nil
 }
 
 func (e *Endpoint) Close() error {
