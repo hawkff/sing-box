@@ -2,6 +2,7 @@ package rule
 
 import (
 	"context"
+	"net/netip"
 	"testing"
 
 	"github.com/sagernet/sing-box/adapter"
@@ -31,9 +32,37 @@ func TestSniffActionOverridesDestinationWithSniffedDomain(t *testing.T) {
 	require.True(t, action.OverrideDestination)
 	require.Equal(t, "sniff(tls,override_destination)", action.String())
 
-	metadata := adapter.InboundContext{Domain: "example.com", Destination: M.ParseSocksaddrHostPort("192.0.2.7", 443)}
+	address := M.ParseSocksaddrHostPort("192.0.2.7", 443)
+	metadata := adapter.InboundContext{Domain: "example.com", Destination: address}
 	action.ApplyDestination(&metadata)
 	require.Equal(t, M.Socksaddr{Fqdn: "example.com", Port: 443}, metadata.Destination)
+	// Packets still addressed to the dialed address are mapped to the name.
+	require.Equal(t, address, metadata.RouteOriginalDestination)
+}
+
+func TestSniffActionOverrideDropsAddressesResolvedForTheOldDestination(t *testing.T) {
+	t.Parallel()
+
+	action := newSniffAction(t, `{"action":"sniff","override_destination":true}`)
+	metadata := adapter.InboundContext{
+		Domain:               "b.example",
+		Destination:          M.Socksaddr{Fqdn: "a.example", Port: 443},
+		DestinationAddresses: []netip.Addr{netip.MustParseAddr("192.0.2.7")},
+	}
+	action.ApplyDestination(&metadata)
+	require.Equal(t, M.Socksaddr{Fqdn: "b.example", Port: 443}, metadata.Destination)
+	require.Empty(t, metadata.DestinationAddresses)
+	require.Equal(t, M.Socksaddr{Fqdn: "a.example", Port: 443}, metadata.RouteOriginalDestination)
+
+	// The same name again changes nothing, and keeps its resolved addresses.
+	same := adapter.InboundContext{
+		Domain:               "b.example",
+		Destination:          M.Socksaddr{Fqdn: "b.example", Port: 443},
+		DestinationAddresses: []netip.Addr{netip.MustParseAddr("192.0.2.8")},
+	}
+	action.ApplyDestination(&same)
+	require.Len(t, same.DestinationAddresses, 1)
+	require.False(t, same.RouteOriginalDestination.IsValid())
 }
 
 func TestSniffActionKeepsDestinationWithoutOverride(t *testing.T) {
