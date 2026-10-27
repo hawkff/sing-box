@@ -429,6 +429,8 @@ func applyRouteOptionsOverride(metadata *adapter.InboundContext, routeOptions *R
 			Port: metadata.Destination.Port,
 			Fqdn: routeOptions.OverrideAddress.Fqdn,
 		}
+		// The address the client dialed no longer says where the connection goes.
+		metadata.OverriddenAddress = netip.Addr{}
 	}
 	if routeOptions.OverridePort > 0 {
 		metadata.Destination = M.Socksaddr{

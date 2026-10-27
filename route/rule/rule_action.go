@@ -575,9 +575,17 @@ func (r *RuleActionSniff) ApplyDestination(metadata *adapter.InboundContext) {
 	if !r.OverrideDestination || !M.IsDomainName(metadata.Domain) {
 		return
 	}
+	// A name read from a connection to the local network, a tailnet or a carrier's own range resolves
+	// only there, if at all: a proxy could not reach it by that name.
+	if metadata.Destination.IsIP() && !reachableByName(metadata.Destination.Addr) {
+		return
+	}
 	destination := M.Socksaddr{Fqdn: metadata.Domain, Port: metadata.Destination.Port}
 	if destination == metadata.Destination {
 		return
+	}
+	if metadata.Destination.IsIP() {
+		metadata.OverriddenAddress = metadata.Destination.Addr
 	}
 	// Packets already carry the address the client dialed; recording it lets the connection map
 	// them to the name and replies back, as an address override does.
@@ -587,6 +595,13 @@ func (r *RuleActionSniff) ApplyDestination(metadata *adapter.InboundContext) {
 	// Addresses resolved for the old destination would otherwise be dialed instead of the name.
 	metadata.DestinationAddresses = nil
 	metadata.Destination = destination
+}
+
+// sharedAddressSpace is the carrier-grade NAT range (RFC 6598), from which Tailscale numbers its nodes.
+var sharedAddressSpace = netip.MustParsePrefix("100.64.0.0/10")
+
+func reachableByName(address netip.Addr) bool {
+	return N.IsPublicAddr(address) && !sharedAddressSpace.Contains(address.Unmap())
 }
 
 type RuleActionResolve struct {

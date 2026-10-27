@@ -66,6 +66,10 @@ type InboundContext struct {
 	SniffContext any
 	SnifferNames []string
 	SniffError   error
+	// OverriddenAddress is the address the client dialed when a sniff action replaced the destination
+	// with the sniffed domain. Address rules keep matching it until the name is resolved or a route
+	// option overrides the address.
+	OverriddenAddress netip.Addr
 
 	// cache
 
