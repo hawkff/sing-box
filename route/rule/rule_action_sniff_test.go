@@ -53,6 +53,8 @@ func TestSniffActionOverrideDropsAddressesResolvedForTheOldDestination(t *testin
 	require.Equal(t, M.Socksaddr{Fqdn: "b.example", Port: 443}, metadata.Destination)
 	require.Empty(t, metadata.DestinationAddresses)
 	require.Equal(t, M.Socksaddr{Fqdn: "a.example", Port: 443}, metadata.RouteOriginalDestination)
+	// A name replacing a name leaves no dialed address behind.
+	require.False(t, metadata.OverriddenAddress.IsValid())
 
 	// The same name again changes nothing, and keeps its resolved addresses.
 	same := adapter.InboundContext{
@@ -63,6 +65,41 @@ func TestSniffActionOverrideDropsAddressesResolvedForTheOldDestination(t *testin
 	action.ApplyDestination(&same)
 	require.Len(t, same.DestinationAddresses, 1)
 	require.False(t, same.RouteOriginalDestination.IsValid())
+}
+
+func TestSniffActionOverrideKeepsAddressesOutsideThePublicInternet(t *testing.T) {
+	t.Parallel()
+
+	action := newSniffAction(t, `{"action":"sniff","override_destination":true}`)
+	// The local network, loopback, link-local, tailnet and carrier addresses, multicast.
+	for _, address := range []string{
+		"192.168.1.10", "10.0.2.2", "127.0.0.1", "169.254.1.1", "100.101.102.103",
+		"::ffff:100.64.0.1", "fd7a:115c:a1e0::1", "fe80::1", "239.255.255.250",
+	} {
+		destination := M.ParseSocksaddrHostPort(address, 443)
+		metadata := adapter.InboundContext{Domain: "nas.example", Destination: destination}
+		action.ApplyDestination(&metadata)
+		require.Equal(t, destination, metadata.Destination, address)
+		require.False(t, metadata.OverriddenAddress.IsValid(), address)
+	}
+}
+
+func TestAddressRulesMatchTheAddressAConnectionByNameWasDialedTo(t *testing.T) {
+	t.Parallel()
+
+	action := newSniffAction(t, `{"action":"sniff","override_destination":true}`)
+	rule, err := NewIPCIDRItem(false, []string{"203.0.113.0/24"})
+	require.NoError(t, err)
+
+	metadata := adapter.InboundContext{Domain: "example.com", Destination: M.ParseSocksaddrHostPort("203.0.113.7", 443)}
+	action.ApplyDestination(&metadata)
+	require.True(t, metadata.Destination.IsFqdn())
+	require.Equal(t, netip.MustParseAddr("203.0.113.7"), metadata.OverriddenAddress)
+	require.True(t, rule.Match(&metadata))
+
+	// Once the name is resolved, address rules see what it resolved to.
+	metadata.DestinationAddresses = []netip.Addr{netip.MustParseAddr("198.51.100.1")}
+	require.False(t, rule.Match(&metadata))
 }
 
 func TestSniffActionKeepsDestinationWithoutOverride(t *testing.T) {

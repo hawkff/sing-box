@@ -93,6 +93,10 @@ func (r *IPCIDRItem) Match(metadata *adapter.InboundContext) bool {
 	if len(metadata.DestinationAddresses) > 0 {
 		return common.Any(metadata.DestinationAddresses, r.ipSet.Contains)
 	}
+	// A connection sent on by its sniffed name still matches by the address the client dialed.
+	if metadata.OverriddenAddress.IsValid() {
+		return r.ipSet.Contains(metadata.OverriddenAddress)
+	}
 	return metadata.IPCIDRAcceptEmpty
 }
 

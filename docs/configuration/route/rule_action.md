@@ -307,7 +307,12 @@ Timeout for sniffing.
 
 Connect to the sniffed domain instead of the address the client dialed: the outbound dials the
 name, and a proxy server resolves it. Names that are not domains, such as an IP address in the
-TLS server name, leave the destination unchanged.
+TLS server name, leave the destination unchanged. So do connections to addresses outside the
+public internet (private, loopback, link-local, multicast and carrier-grade NAT ranges), whose
+names resolve only there.
+
+Until the name is resolved, `ip_cidr` rules and the IP rules in rule sets match the address the
+client dialed.
 
 Some clients reach a server under a name that does not resolve to it; turn this off for them.
 
