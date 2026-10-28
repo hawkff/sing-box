@@ -10,6 +10,7 @@ import (
 
 	"github.com/sagernet/sing-box/adapter"
 	"github.com/sagernet/sing-box/dns"
+	"github.com/sagernet/sing/common"
 
 	mDNS "github.com/miekg/dns"
 )
@@ -72,13 +73,14 @@ func TestDNSTransportExchangeMostSpecificRoute(t *testing.T) {
 			wantResolvers:  []string{"root"},
 		},
 		{
-			name:     "empty parent does not hide child",
+			// Tailscale's resolver is authoritative under a route without resolvers, more specific forwarded routes included.
+			name:     "empty parent hides child",
 			question: "host.dev.example.com.",
 			routes: map[string][]string{
 				"example.com.":     nil,
 				"dev.example.com.": {"child"},
 			},
-			wantResolvers: []string{"child"},
+			wantRcode: mDNS.RcodeNameError,
 		},
 		{
 			name:     "empty child is authoritative",
@@ -179,7 +181,16 @@ func TestDNSTransportExchangeMostSpecificRoute(t *testing.T) {
 				for _, tag := range tags {
 					transport.routes[suffix] = append(transport.routes[suffix], newResolver(tag))
 				}
+				if len(tags) == 0 {
+					transport.domains.localSuffixes = append(transport.domains.localSuffixes, suffix)
+				} else {
+					transport.domains.forwardedSuffixes = append(transport.domains.forwardedSuffixes, suffix)
+				}
 			}
+			// As newTailnetDomains does: the most specific forwarded route is tried first.
+			common.SortBy(transport.domains.forwardedSuffixes, func(it string) int {
+				return -mDNS.CountLabel(it)
+			})
 			message := &mDNS.Msg{
 				MsgHdr: mDNS.MsgHdr{Id: 1234},
 				Question: []mDNS.Question{{

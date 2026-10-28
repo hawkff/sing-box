@@ -170,7 +170,7 @@ func (h *Outbound) DialContext(ctx context.Context, network string, destination 
 	case N.NetworkTCP:
 		h.logger.InfoContext(ctx, "outbound connection to ", destination)
 		if h.pool != nil {
-			return h.client.DialContextWithPool(ctx, h.pool, destination)
+			return h.client.DialContextWithPool(adapter.ContextForMultiplexSession(ctx), h.pool, destination)
 		}
 		rawConn, err := h.dialer.DialContext(ctx, N.NetworkTCP, h.serverAddr)
 		if err != nil {
