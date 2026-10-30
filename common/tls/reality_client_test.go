@@ -57,6 +57,11 @@ func TestRealityClient_HandshakeFragmentsClientHello(t *testing.T) {
 		})
 		require.NoError(t, err)
 		client, server := net.Pipe()
+		// A failed read must still release the handshake goroutine.
+		t.Cleanup(func() {
+			client.Close()
+			server.Close()
+		})
 		go config.(*RealityClientConfig).ClientHandshake(context.Background(), client)
 		writes, records := readClientHello(t, server)
 		client.Close()
