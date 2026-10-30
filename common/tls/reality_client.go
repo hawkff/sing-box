@@ -28,6 +28,7 @@ import (
 	"unsafe"
 
 	"github.com/sagernet/sing-box/adapter"
+	tf "github.com/sagernet/sing-box/common/tlsfragment"
 	C "github.com/sagernet/sing-box/constant"
 	"github.com/sagernet/sing-box/option"
 	"github.com/sagernet/sing/common/debug"
@@ -127,11 +128,21 @@ func (e *RealityClientConfig) STDConfig() (*STDConfig, error) {
 	return nil, E.New("unsupported usage for reality")
 }
 
+// fragmentConn splits the ClientHello as UTLSClientConfig.Client does, so that fragment and
+// record_fragment apply to REALITY too: its handshake builds the uTLS connection itself.
+func (e *RealityClientConfig) fragmentConn(conn net.Conn) net.Conn {
+	if !e.uClient.fragment && !e.uClient.recordFragment {
+		return conn
+	}
+	return tf.NewConn(conn, e.uClient.ctx, e.uClient.fragment, e.uClient.recordFragment, e.uClient.fragmentFallbackDelay)
+}
+
 func (e *RealityClientConfig) Client(conn net.Conn) (Conn, error) {
 	return ClientHandshake(context.Background(), conn, e)
 }
 
 func (e *RealityClientConfig) ClientHandshake(ctx context.Context, conn net.Conn) (aTLS.Conn, error) {
+	conn = e.fragmentConn(conn)
 	verifier := &realityVerifier{
 		serverName: e.uClient.ServerName(),
 	}
