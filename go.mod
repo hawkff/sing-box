@@ -209,12 +209,12 @@ require (
 
 replace github.com/reF1nd/sing-snell => github.com/reF1nd/sing-snell-reF1nd v0.0.8
 
-replace github.com/sagernet/sing-vmess => github.com/hawkff/sing-vmess v0.2.8-mod.4
+replace github.com/sagernet/sing-vmess => github.com/nyaakuza/sing-vmess v0.2.8-mod.4
 
 // AmneziaWG for the Tailscale endpoint: the device obfuscation and the engine hook.
-replace github.com/sagernet/wireguard-go => github.com/hawkff/wireguard-go v0.0.8-0.20261028195059-3c5a73645a5b
+replace github.com/sagernet/wireguard-go => github.com/nyaakuza/wireguard-go v0.0.8-0.20261028195059-3c5a73645a5b
 
-replace github.com/sagernet/tailscale => github.com/hawkff/tailscale v1.102.1-sing-box-1.14-mod.5.0.20261028194817-175451e9604b
+replace github.com/sagernet/tailscale => github.com/nyaakuza/tailscale v1.102.1-sing-box-1.14-mod.5.0.20261028194817-175451e9604b
 
 // The AmneziaWG device with the timer race fix of amnezia-vpn/amneziawg-go#205, until upstream merges it.
-replace github.com/amnezia-vpn/amneziawg-go/v3 => github.com/hawkff/amneziawg-go/v3 v3.1.20260829-0.20261009183831-0421ab3db604
+replace github.com/amnezia-vpn/amneziawg-go/v3 => github.com/nyaakuza/amneziawg-go/v3 v3.1.20260829-0.20261009183831-0421ab3db604
